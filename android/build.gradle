@@ -7,7 +7,6 @@ buildscript {
         google()
         mavenCentral()
     }
-
     dependencies {
         classpath("com.android.tools.build:gradle:8.3.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
@@ -22,27 +21,25 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-// No need to apply kotlin-android plugin here
+// No kotlin-android plugin here — Flutter host handles Kotlin
 
 android {
-    compileSdk = 34
+    compileSdkVersion 34
+    namespace "dev.fluttercommunity.android_id"
 
-    // Required for AGP 8.x: specify a namespace
-    namespace = "dev.fluttercommunity.android_id"
+    defaultConfig {
+        minSdkVersion 21
+    }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
     }
 
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
-    }
-
-    defaultConfig {
-        minSdk = 21
     }
 
     testOptions {
@@ -55,20 +52,17 @@ android {
             }
         }
     }
-
-    // Remove any afterEvaluate or other plugin hooks to prevent conflicts
 }
 
-// Correct place for kotlinOptions
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-}
-
-// Optional: add core library desugaring dependency if needed
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.12.0")
+}
+
+// THIS MUST BE OUTSIDE THE ANDROID BLOCK
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all { 
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
