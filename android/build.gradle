@@ -2,14 +2,14 @@ group = "dev.fluttercommunity.android_id"
 version = "1.0-SNAPSHOT"
 
 buildscript {
-    ext.kotlin_version = "2.0.0"
+    ext.kotlin_version = "1.9.10"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.4")
+        classpath("com.android.tools.build:gradle:8.3.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
@@ -22,22 +22,17 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-//apply plugin: "kotlin-android"
+// No need to apply kotlin-android plugin here
 
 android {
-    if (project.android.hasProperty("namespace")) {
-        namespace = "dev.fluttercommunity.android_id"
-    }
-
     compileSdk = 34
+
+    // Required for AGP 8.x: specify a namespace
+    namespace = "dev.fluttercommunity.android_id"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     sourceSets {
@@ -49,20 +44,26 @@ android {
         minSdk = 21
     }
 
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
+            }
+        }
+    }
+
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.12.0")
     }
+}
 
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-
-            testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
-            }
-        }
+// Correct place for kotlinOptions
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
     }
 }
