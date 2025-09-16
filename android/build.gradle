@@ -21,7 +21,7 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-// Do NOT apply kotlin-android — Flutter host app handles Kotlin
+apply plugin: "kotlin-android" // REQUIRED
 
 android {
     compileSdkVersion 34
@@ -60,8 +60,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:5.12.0"
 }
 
-// --- THIS IS THE KEY FIX ---
-// Apply JVM target to all Kotlin compile tasks using Groovy DSL
+// --- JVM target for Kotlin ---
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
     kotlinOptions {
         jvmTarget = "17"
