@@ -21,7 +21,7 @@ allprojects {
 }
 
 apply plugin: "com.android.library"
-// No kotlin-android plugin here — Flutter host handles Kotlin
+// Do NOT apply kotlin-android — Flutter host app handles Kotlin
 
 android {
     compileSdkVersion 34
@@ -55,13 +55,14 @@ android {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.mockito:mockito-core:5.12.0")
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:2.0.3"
+    testImplementation "org.jetbrains.kotlin:kotlin-test"
+    testImplementation "org.mockito:mockito-core:5.12.0"
 }
 
-// THIS MUST BE OUTSIDE THE ANDROID BLOCK
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all { 
+// --- THIS IS THE KEY FIX ---
+// Apply JVM target to all Kotlin compile tasks using Groovy DSL
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
     kotlinOptions {
         jvmTarget = "17"
     }
